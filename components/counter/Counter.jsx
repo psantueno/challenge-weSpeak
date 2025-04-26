@@ -1,18 +1,17 @@
 'use client'
 
-import { useState, useEffect } from 'react';
-import { supabase } from '../../lib/supabase';
-import { getCounterValue, incrementCounter, decrementCounter } from '../../app/actions';
+import { useState, useEffect } from 'react'
+import { supabase } from '../../lib/supabase'
+import { incrementCounter, decrementCounter } from '../../app/actions'
 import { LoaderComponent, ErrorMsg, WarningMsg } from '../../components';
-import { TriangleAlert } from 'lucide-react';
-import './Counter.css';
+import { TriangleAlert } from 'lucide-react'
+import './Counter.css'
 
 export const Counter = ({ initialValue }) => {
   const [count, setCount] = useState(initialValue ?? null);
   const [isUpdating, setIsUpdating] = useState(false);
   const [error, setError] = useState(null);
   const [resetMessage, setResetMessage] = useState(null);
-  const [isLoading, setIsLoading] = useState(!initialValue);
 
   const handleAction = async (action) => {
     setIsUpdating(true);
@@ -29,43 +28,47 @@ export const Counter = ({ initialValue }) => {
   };
 
   useEffect(() => {
-    const fetchLatest = async () => {
-      try {
-        const latestValue = await getCounterValue();
-        setCount(latestValue);
-      } catch (err) {
-        console.error('Error fetching latest value:', err);
-        setError('No se pudo obtener el valor actualizado.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchLatest();
-
-    const channel = supabase.channel('counter_channel');
+    const channel = supabase.channel('counter_channel')
     channel
       .on('postgres_changes', { event: '*', schema: 'public' }, (payload) => {
-        if (payload?.new?.value !== undefined) {
-          setCount(payload.new.value);
-          if (payload.new.value === 0) {
-            setResetMessage('El contador ha sido restablecido por inactividad.');
+        try {
+          if (payload?.new) {
+            const data = payload.new
+            if (data?.value !== undefined) {
+              setCount(data.value)
+              if (data.value === 0) {
+                setResetMessage('El contador ha sido restablecido por inactividad.');
+              }
+            }
+          } else {
+            console.error('Payload does not contain "new" data:', payload)
           }
+        } catch (err) {
+          console.error('Error handling payload:', err)
         }
       })
-      .subscribe();
+      .subscribe()
 
     return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
+      supabase.removeChannel(channel)
+    }
+  }, [])
 
-  if (error) return <ErrorMsg error={error} setError={setError} />;
-  if (isLoading) return <LoaderComponent msg="Cargando contador..." />;
+  if (error) {
+    return <ErrorMsg error={error} setError={setError} />;
+  }
+
+  // ⚡ Nueva parte: si el contador todavía no está disponible, mostramos loader
+  if (count === null) {
+    return (
+      <div className="counter-loader">
+        <LoaderComponent msg="Cargando contador..." />
+      </div>
+    )
+  }
 
   return (
     <>
-      {/* Contenido del contador igual que antes */}
       <div className="counter-container">
         <div className="display">
           <span className="label">Contador:</span>
@@ -77,7 +80,7 @@ export const Counter = ({ initialValue }) => {
             onClick={() => handleAction(decrementCounter)}
             disabled={isUpdating}
             title="Disminuir"
-            aria-label="Disminuir contador" >
+            aria-label='Disminuir contador'>
             -
           </button>
           <button
@@ -85,7 +88,7 @@ export const Counter = ({ initialValue }) => {
             onClick={() => handleAction(incrementCounter)}
             disabled={isUpdating}
             title="Aumentar"
-            aria-label="Aumentar contador">
+            aria-label='Aumentar contador'>
             +
           </button>
         </div>
@@ -101,10 +104,10 @@ export const Counter = ({ initialValue }) => {
 
       <div className="counter-reset">
         <p className="info">
-          <TriangleAlert size={14} color="#000000" fill="yellow" className='icon' />
+          <TriangleAlert size={14} color='#000000' fill="yellow" className='icon' />
           El contador se reiniciará automáticamente después de 20 minutos de inactividad.
         </p>
       </div>
     </>
-  );
+  )
 }

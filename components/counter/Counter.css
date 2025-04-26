@@ -73,3 +73,18 @@
     color: #666;
     text-align: center;
   }
+
+
+  /* Fade-in para el contador */
+.display .value {
+  opacity: 0;
+  animation: fadeIn 0.5s ease forwards;
+}
+
+/* Definimos la animación */
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
