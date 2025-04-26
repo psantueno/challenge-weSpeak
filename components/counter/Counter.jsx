@@ -30,7 +30,7 @@ export const Counter = ({ initialValue }) => {
   useEffect(() => {
     const channel = supabase.channel('counter_channel')
     channel
-      .on('postgres_changes', { event: '*', schema: 'public' }, (payload) => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'counter' }, (payload) => {
         try {
           if (payload?.new) {
             const data = payload.new
@@ -53,6 +53,33 @@ export const Counter = ({ initialValue }) => {
       supabase.removeChannel(channel)
     }
   }, [])
+
+   // refresca contador al volver a la pestaña
+   useEffect(() => {
+    const handleVisibilityChange = async () => {
+      if (document.visibilityState === 'visible') {
+        const { data, error } = await supabase
+          .from('counter')
+          .select('value')
+          .single();
+
+        if (error) {
+          console.error('Error al traer contador al volver:', error);
+        } else {
+          setCount(data.value);
+          if (data.value === 0) {
+            setResetMessage('El contador ha sido restablecido por inactividad.');
+          }
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
 
   if (error) {
     return <ErrorMsg error={error} setError={setError} />;
