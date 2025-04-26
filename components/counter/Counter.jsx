@@ -7,11 +7,13 @@ import { LoaderComponent, ErrorMsg, WarningMsg } from '../../components';
 import { TriangleAlert } from 'lucide-react'
 import './Counter.css'
 
+// MAnejo de estados
 export const Counter = ({ initialValue }) => {
   const [count, setCount] = useState(initialValue ?? null);
   const [isUpdating, setIsUpdating] = useState(false);
   const [error, setError] = useState(null);
   const [resetMessage, setResetMessage] = useState(null);
+
 
   const handleAction = async (action) => {
     setIsUpdating(true);
@@ -27,6 +29,7 @@ export const Counter = ({ initialValue }) => {
     }
   };
 
+  // canal con realtime de supabase
   useEffect(() => {
     const channel = supabase.channel('counter_channel')
     channel
@@ -35,9 +38,16 @@ export const Counter = ({ initialValue }) => {
           if (payload?.new) {
             const data = payload.new
             if (data?.value !== undefined) {
-              setCount(data.value)
-              if (data.value === 0) {
-                setResetMessage('El contador ha sido restablecido por inactividad.');
+              setCount(data.value);
+
+              if (data.value === 0 && data.updated_at) {
+                const lastUpdated = new Date(data.updated_at);
+                const now = new Date();
+                const minutesDiff = (now.getTime() - lastUpdated.getTime()) / (1000 * 60);
+
+                if (minutesDiff >= 19) {
+                  setResetMessage('El contador ha sido restablecido por inactividad.');
+                }
               }
             }
           } else {
@@ -54,8 +64,10 @@ export const Counter = ({ initialValue }) => {
     }
   }, [])
 
-   // refresca contador al volver a la pestaña
-   useEffect(() => {
+
+
+  // refresca contador al volver a la pestaña
+  useEffect(() => {
     const handleVisibilityChange = async () => {
       if (document.visibilityState === 'visible') {
         const { data, error } = await supabase
