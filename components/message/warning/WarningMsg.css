@@ -1,0 +1,52 @@
+.warning-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+  }
+  
+  .warning-box {
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+    border-radius: 8px;
+    padding: 16px 20px 16px 20px; /* Más padding a la derecha para el botón */
+    max-width: 450px;
+    width: 100%;
+    text-align: left;
+    position: relative;
+    box-shadow: 0 0 10px rgba(255, 235, 102, 0.5);
+  }
+  
+  .warning-message {
+    color: #856404;
+    font-size: 15px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    padding-right: 20px; /* Espacio adicional para evitar superposición */
+  }
+  
+  .close-button {
+    position: absolute;
+    top: 12px; /* Ajustado para alinearse mejor */
+    right: 12px;
+    background: transparent;
+    border: none;
+    color: #856404;
+    cursor: pointer;
+    padding: 4px;
+    transition: all 0.2s ease;
+  }
+  
+  .close-button:hover {
+    background: transparent;
+    transform: scale(1.1);
+
+  }
+  
+  .icon-warning {
+    flex-shrink: 0; /* Evita que el icono se reduzca */
+    transform: translateY(-1px);
+  }

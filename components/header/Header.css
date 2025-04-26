@@ -1,0 +1,23 @@
+
+.header {
+  width: 100%;
+  padding: 20px 0;
+  text-align: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: var(--background);
+  z-index: 100;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.header h1 {
+  font-size: 28px;
+  margin: 0;
+  color: var(--foreground);
+}
+
+.header-icon {
+    margin-right: 10px; /* Espaciado entre el ícono y el texto */
+    transform: translateY(2px); /* Ajustamos la verticalidad del ícono */
+  }
