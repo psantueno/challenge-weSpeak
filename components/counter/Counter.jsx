@@ -43,9 +43,10 @@ export const Counter = ({ initialValue }) => {
               if (data.value === 0 && data.updated_at) {
                 const lastUpdated = new Date(data.updated_at);
                 const now = new Date();
+                console.log('Last updated:', lastUpdated, 'Now:', now, 'Diff:', now.getTime() - lastUpdated.getTime());
                 const minutesDiff = (now.getTime() - lastUpdated.getTime()) / (1000 * 60);
 
-                if (minutesDiff >= 19) {
+                if (minutesDiff >= 20) {
                   setResetMessage('El contador ha sido restablecido por inactividad.');
                 }
               }
@@ -72,15 +73,26 @@ export const Counter = ({ initialValue }) => {
       if (document.visibilityState === 'visible') {
         const { data, error } = await supabase
           .from('counter')
-          .select('value')
+          .select('value, last_updated')
           .single();
 
         if (error) {
           console.error('Error al traer contador al volver:', error);
         } else {
           setCount(data.value);
-          if (data.value === 0) {
-            setResetMessage('El contador ha sido restablecido por inactividad.');
+
+          if (data.value === 0 && data.last_updated) {
+            const lastUpdated = new Date(data.last_updated);
+            const now = new Date();
+            const differenceInMinutes = (now.getTime() - lastUpdated.getTime()) / (1000 * 60);
+
+            if (differenceInMinutes >= 20) {  // 19.9 para ser permisivos
+              setResetMessage('El contador ha sido restablecido por inactividad.');
+            } else {
+              setResetMessage(null); // Evitamos mostrar el cartel si no es por inactividad real
+            }
+          } else {
+            setResetMessage(null);
           }
         }
       }
@@ -92,6 +104,7 @@ export const Counter = ({ initialValue }) => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, []);
+
 
   if (error) {
     return <ErrorMsg error={error} setError={setError} />;
