@@ -1,4 +1,6 @@
-// import { Counter } from '../components/Counter';
+export const dynamic = 'force-dynamic';
+
+
 import { getCounterValue } from './actions';
 import { Counter} from '../components/counter/Counter';
 
