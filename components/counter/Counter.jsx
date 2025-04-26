@@ -40,8 +40,8 @@ export const Counter = ({ initialValue }) => {
             if (data?.value !== undefined) {
               setCount(data.value);
 
-              if (data.value === 0 && data.updated_at) {
-                const lastUpdated = new Date(data.updated_at);
+              if (data.value === 0 && data.last_updated) {
+                const lastUpdated = new Date(data.last_updated);
                 const now = new Date();
                 console.log('Last updated:', lastUpdated, 'Now:', now, 'Diff:', now.getTime() - lastUpdated.getTime());
                 const minutesDiff = (now.getTime() - lastUpdated.getTime()) / (1000 * 60);
@@ -85,6 +85,7 @@ export const Counter = ({ initialValue }) => {
             const lastUpdated = new Date(data.last_updated);
             const now = new Date();
             const differenceInMinutes = (now.getTime() - lastUpdated.getTime()) / (1000 * 60);
+            console.log('Last updated:', lastUpdated, 'Now:', now, 'Diff:', differenceInMinutes);
 
             if (differenceInMinutes >= 20) {  // 19.9 para ser permisivos
               setResetMessage('El contador ha sido restablecido por inactividad.');
